@@ -4,17 +4,20 @@ util.AddNetworkString("make_offer")
 util.AddNetworkString("update_offers")
 util.AddNetworkString("end_auction")
 
-local all_offers = {
+local all_offers
+function init_offers()
+  all_offers = {
   [1] = {},
   [2] = {}
-} --key: team id, value: table(key: userid, value: offer value)
+  } --key: team id, value: table(key: SteamID64, value: offer value)
+end
 
 local curr_card = nil
 
 
 net.Receive("make_offer", function(len, ply)
   local offer = net.ReadInt(32)
-  local id = ply:UserID()
+  local id = ply:SteamID64()
   local ply_team = ply:Team()
   all_offers[ply_team][id] = offer
   
@@ -83,7 +86,7 @@ function end_auction()
   for k, v in pairs(player.GetAll()) do
     if v:Team() == effect_target_team then
       --TODO: Add effect to player's effect list.
-      --table.insert(get_applied_effects()[v:UserID()], effect)
+      --table.insert(get_applied_effects()[v:SteamID64()], effect)
       effect.run(v)
 
     end
@@ -92,7 +95,10 @@ function end_auction()
   
 end
 
+
+
 function start_auction()
+  init_offers()
   local MAX_TIME = 30
 
   local all_cards = get_cards()

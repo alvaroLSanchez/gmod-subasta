@@ -93,7 +93,7 @@ net.Receive("set_ragdoll", function()
 end)
 
 hook.Add( "CreateClientsideRagdoll", "set_target", function( entity, ragdoll_entity )
-  if entity:IsPlayer() and entity:UserID() == LocalPlayer():UserID() then
+  if entity:IsPlayer() and entity:SteamID64() == LocalPlayer():SteamID64() then
 	  target_entity = ragdoll_entity
   end
 end )

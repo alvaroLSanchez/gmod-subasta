@@ -6,10 +6,11 @@ util.AddNetworkString("set_frozen")
 util.AddNetworkString("set_ragdoll")
 util.AddNetworkString("ragdoll_position")
 
+local initial_grados = {[1] = 40, [2] = 40}
 
-local grados = {[1] = 40, [2] = 40}
+local grados
 
-local applied_effects = {} -- key: userid. value: seq Table (player_effect)
+local applied_effects = {} -- key: SteamID64. value: seq Table (player_effect)
 
 function get_applied_effects()
   return applied_effects
@@ -18,6 +19,11 @@ end
 function get_grados()
   return grados
 end
+
+function init_grados()
+  grados = {[1] = 40, [2] = 40}
+end
+
 
 
 function random_timing_effect(ply, interval, timer_prefix, effect_function)
@@ -44,7 +50,7 @@ function ragdoll_player(ply, duration)
 
   local rag = ply:GetRagdollEntity()
   -- 2. Restore the player after the duration
-  timer.Create("ragdoll_timer" .. ply:UserID(), duration, 1, function()
+  timer.Create("ragdoll_timer" .. ply:SteamID64(), duration, 1, function()
     if IsValid(ply) and IsValid(rag) then
       -- Teleport player to the ragdoll's location
       --ply:SetPos(rag:GetPos())
@@ -70,7 +76,7 @@ end)
 
 function ragdoll_function(ply)
 
-  local chance = 1/30
+  local chance = 1/1
   
   random_timing_effect(ply, 10, "ragdoll_chance_timer", function()
     local dice_roll = math.random()
@@ -84,8 +90,7 @@ function ragdoll_cleanup(ply)
   cleanup_random_timing_effect(ply, "ragdoll_chance_timer")
 end
 
-function apply_frostbite(ply)
-  local duration = 3
+function apply_frostbite(ply, duration)
 
   local ent = ents.Create("ice_cube")
 
@@ -102,7 +107,7 @@ function apply_frostbite(ply)
   net.Send(ply)
   ply:SetFriction(0)
   ply:Freeze(true)
-  timer.Create("frostbite_timer" .. ply:UserID(), duration, 1, function()
+  timer.Create("frostbite_timer" .. ply:SteamID64(), duration, 1, function()
     if IsValid(ply) then
       ent:Remove()
       net.Start("set_frozen")
@@ -116,12 +121,12 @@ end
 
 function frostbite_function(ply)
 
-  local chance = 1/30
+  local chance = 1/1
   
   random_timing_effect(ply, 10, "frostbite_chance_timer", function()
     local dice_roll = math.random()
     if dice_roll <= chance then
-      ragdoll_player(ply, 3) -- Ragdoll for 3 seconds
+      apply_frostbite(ply, 3) -- Frostbite for 3 seconds
     end
   end)
 end
@@ -194,7 +199,7 @@ end
 
 
 gameevent.Listen( "player_say" )
-hook.Add( "player_say", "apply_effect", function( data ) 
+hook.Add( "player_say", "apply effect", function( data ) 
 	local priority = SERVER and data.Priority or 1 	// Priority ??
 	local id = data.userid				// Same as Player:UserID() for the speaker
 	local text = data.text				// The written text.
@@ -206,7 +211,7 @@ hook.Add( "player_say", "apply_effect", function( data )
   end
 end)
 
-hook.Add( "player_say", "remove_effect", function( data ) 
+hook.Add( "player_say", "remove effect", function( data ) 
 	local priority = SERVER and data.Priority or 1 	// Priority ??
 	local id = data.userid				// Same as Player:UserID() for the speaker
 	local text = data.text				// The written text.
@@ -216,6 +221,15 @@ hook.Add( "player_say", "remove_effect", function( data )
     if player_effects[effect_name].clean_up then
       player_effects[effect_name].clean_up(ply)
     end
+  end
+end)
+
+hook.Add( "player_say", "end round", function( data ) 
+	local priority = SERVER and data.Priority or 1 	// Priority ??
+	local id = data.userid				// Same as Player:UserID() for the speaker
+	local text = data.text				// The written text.
+  if string.StartsWith(text,"/end_round ") and get_round_status() == 1 then
+    end_round()
   end
 end)
 

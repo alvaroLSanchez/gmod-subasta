@@ -1,3 +1,5 @@
+include("util/shared_debug_id.lua")
+
 GM.Name = "Subasta"
 
 function GM:Initialize()
@@ -6,8 +8,8 @@ end
 
 function setup_teams()
   team.SetUp(0, "Espectador", Color(128, 128, 128))
-  team.SetUp(1, "Equipo 1", Color(255, 0, 0))
-  team.SetUp(2, "Equipo 2", Color(0, 0, 255))
+  team.SetUp(1, "Verano", Color(255, 0, 0))
+  team.SetUp(2, "Invierno", Color(0, 0, 255))
 end
 setup_teams()
 

@@ -5,20 +5,12 @@ util.AddNetworkString("broadcast_teams")
 util.AddNetworkString("lobby_ready")
 util.AddNetworkString("broadcast_ready")
 
-function enter_lobby(ply)
+function open_lobby(ply)
   net.Start("open_lobby")
   net.Send(ply)
-  net.Broadcast()
 end
 
-net.Receive("client_ready", function(len, ply)
-  ply:SetTeam(0)
-  if(get_round_status() == 0) then
-    enter_lobby(ply)
-  end
-end)
-
-local ready_players = {} -- Player ID as the key, boolean as the value
+local ready_players = {} -- SteamID64 as the key, boolean as the value
 
 local team_1_players = {}
 local team_2_players = {}
@@ -49,11 +41,11 @@ end)
 net.Receive("lobby_ready", function(len, ply)
   local is_ready = net.ReadBool()
   print(is_ready)
-  local user_id = ply:UserID()
+  local steam_id = ply:SteamID64()
   if is_ready then
-    ready_players[user_id] = true
+    ready_players[steam_id] = true
   else
-    ready_players[user_id] = nil 
+    ready_players[steam_id] = nil 
   end
 
   net.Start("broadcast_ready")
@@ -85,7 +77,9 @@ hook.Add( "player_say", "player_say_example", function( data )
 
   --TODO: Count only players that are in a team for the player count
   if text == "/startgame" and ready_count == total_count and ready_count != 0 then
+    init_grados()
     net.Start("start_game")
+    net.WriteTable(get_grados())
     net.Broadcast()
     begin_round()
   end

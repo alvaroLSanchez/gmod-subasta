@@ -56,7 +56,7 @@ local card_panel = nil
 local offers_panel = nil
 local card = nil
 
-local offers = {} -- key: userid, value: offer value or nil
+local offers = {} -- key: SteamID64, value: offer value or nil
 
 function create_card_panel(card)
   if IsValid(card_panel) then card_panel:Remove() end
@@ -156,8 +156,8 @@ function create_offers_panel(card)
     player_pfp:SetSize(PFP_SIZE, PFP_SIZE)
     player_pfp:SetPos(0, PFP_SIZE/2)
     player_pfp:SetPlayer(ply, PFP_SIZE)
-
-    local offer_value = offers[ply:UserID()]
+    local offer_value = offers[ply:SteamID64()]
+    print(offer_value)
     local player_name_width = player_name:GetTextSize()
     local player_name_x = player_name:GetPos()
 
@@ -173,7 +173,7 @@ end
 
 local start_time = nil
 
-function create_frame()
+function create_auction_frame()
 
   frame = vgui.Create("DFrame")
 
@@ -247,7 +247,7 @@ net.Receive("start_auction", function()
   card = net.ReadTable()
   auction_active = true
 
-  create_frame()
+  create_auction_frame()
   create_card_panel(card)
   create_offers_panel()
   frame:SetVisible(true)

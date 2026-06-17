@@ -1,7 +1,12 @@
 local round_status = 0
 
 net.Receive("update_round_status", function()
-  round_status = net.ReadInt(4)
+  local status = net.ReadInt(4)
+  if round_status == 0 then
+    end_round()
+  elseif round_status == 1 then
+    begin_round()
+  end
 end)
 
 function end_round()
