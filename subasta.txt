@@ -1,0 +1,9 @@
+"Gamemode"
+{
+	"base"	"base"
+	"title" "Subasta"
+	"maps"	"*"
+	"menusystem" "1"
+	
+	"Settings"
+}
