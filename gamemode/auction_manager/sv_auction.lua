@@ -85,14 +85,9 @@ function end_auction()
 
   for k, v in pairs(player.GetAll()) do
     if v:Team() == effect_target_team then
-      --TODO: Add effect to player's effect list.
-      --table.insert(get_applied_effects()[v:SteamID64()], effect)
-      effect.run(v)
-
+      apply_effect(ply, effect)
     end
   end
-
-  
 end
 
 

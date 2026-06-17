@@ -1,8 +1,8 @@
 function get_numbers_from_text(txt)
-local str = ""
-string.gsub(txt,"%d+",function(e)
- str = str .. e
-end)
+  local str = ""
+  string.gsub(txt,"%d+",function(e)
+    str = str .. e
+  end)
 return str;
 end
 
@@ -14,7 +14,7 @@ function get_seconds(num)
   return math.floor(num)..""
 end
 
-function get_frac(num)
+function get_frac(num) --Get deciseconds and centiseconds for the clock (0:00)
     local decimals = string.format("%.2f", num - math.floor(num)):sub(3)
     return decimals
 end

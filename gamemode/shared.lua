@@ -1,4 +1,5 @@
 include("util/shared_debug_id.lua")
+include("util/dump.lua")
 
 GM.Name = "Subasta"
 
